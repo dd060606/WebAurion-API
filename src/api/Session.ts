@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import ScheduleApi from "./ScheduleApi";
+import { getJSFFormParams, getViewState } from "../utils/AurionUtils";
 
 class Session {
     private client: AxiosInstance;
@@ -17,6 +18,66 @@ class Session {
     // API pour le calendrier
     public getScheduleApi(): ScheduleApi {
         return new ScheduleApi(this);
+    }
+
+    // (1ère phase) Besoin de simuler le clic sur la sidebar pour obtenir le ViewState nécessaire aux fonctionnements des reqûetes
+    public sendSidebarRequest(
+        subMenuId: string,
+        viewState: string,
+    ): Promise<string> {
+        return new Promise<string>(async (resolve, reject) => {
+            try {
+                // 1 ère sidebar: formId = j_idt46, renderId = sidebar
+                const params = getJSFFormParams(
+                    "j_idt46",
+                    "sidebar",
+                    viewState,
+                );
+                // On ajoute l'ID du sous-menu qui correspond à la rubrique chosie (Scolarité, mon compte, divers, ...)
+                params.append(
+                    "webscolaapp.Sidebar.ID_SUBMENU",
+                    `submenu_${subMenuId}`,
+                );
+                // On envoie la requête POST
+                const response = await this.sendPOST<string>(
+                    "faces/Planning.xhtml",
+                    params,
+                );
+                resolve(response);
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    // (2ème phase) Simulation du sous menu de la side bar pour obtenir le ViewState nécessaire aux fonctionnements des requêtes
+    // Cette fonction retourne un second ViewState qui sera utilisé pour effectuer les prochaines requêtes POST
+    public sendSidebarSubmenuRequest(
+        subMenuId: string,
+        viewState: string,
+    ): Promise<string> {
+        return new Promise<string>(async (resolve, reject) => {
+            try {
+                const params = new URLSearchParams();
+                // On ajoute les paramètres nécessaires pour effectuer une requête POST
+                params.append("form", "form");
+                params.append("javax.faces.ViewState", viewState);
+                params.append("form:sidebar", "form:sidebar");
+                params.append("form:sidebar_menuid", subMenuId);
+                const response = await this.sendPOST<string>(
+                    "faces/Planning.xhtml",
+                    params,
+                );
+                const secondViewState = getViewState(response);
+                if (secondViewState) {
+                    resolve(secondViewState);
+                } else {
+                    reject(new Error("Viewstate not found"));
+                }
+            } catch (err) {
+                reject(err);
+            }
+        });
     }
 
     public sendGET<T>(url: string): Promise<T> {

@@ -1,4 +1,8 @@
-import { getJSONSchedule, getViewState } from "../utils/AurionUtils";
+import {
+    getJSFFormParams,
+    getViewState,
+    scheduleResponseToEvents,
+} from "../utils/AurionUtils";
 import Session from "./Session";
 
 class ScheduleApi {
@@ -7,75 +11,66 @@ class ScheduleApi {
         this.session = session;
     }
 
-    public fetchSchedule(): Promise<string> {
-        return new Promise<string>(async (resolve, reject) => {
+    // Récupération de l'emploi du temps en fonction de la date de début et de fin (timestamps en millisecondes)
+    public fetchSchedule(
+        startDate?: string,
+        endDate?: string,
+    ): Promise<ScheduleEvent[]> {
+        return new Promise<ScheduleEvent[]>(async (resolve, reject) => {
             try {
                 const schedulePage = await this.session.sendGET<string>(
                     "/faces/Planning.xhtml",
                 );
                 let viewState = getViewState(schedulePage);
                 if (viewState) {
-                    const params = new URLSearchParams();
-                    // On ajoute les paramètres nécessaires pour effectuer une requête POST
-                    params.append("javax.faces.partial.ajax", "true");
-                    params.append("javax.faces.source", "form:j_idt46");
-                    params.append(
-                        "javax.faces.partial.execute",
-                        "form:j_idt46",
+                    // Ici 291906 correspond au menu 'Scolarité' dans la sidebar
+                    // Requête utile pour intialiser le ViewState (obligatoire pour effectuer une requête)
+                    await this.session.sendSidebarRequest("291906", viewState);
+
+                    // Ici 1_4 correspond au sous-menu 'Emploi du temps' dans la sidebar
+                    // On récupère le ViewState pour effectuer la prochaine requête
+                    viewState = await this.session.sendSidebarSubmenuRequest(
+                        "1_4",
+                        viewState,
                     );
-                    params.append("javax.faces.partial.render", "form:sidebar");
-                    params.append("form:j_idt46", "form:j_idt46");
-                    params.append(
-                        "webscolaapp.Sidebar.ID_SUBMENU",
-                        "submenu_291906",
+
+                    // On envoie enfin la requête pour obtenir l'emploi du temps
+                    const params = getJSFFormParams(
+                        "j_idt118",
+                        "j_idt118",
+                        viewState,
                     );
-                    params.append("form", "form");
-                    params.append("javax.faces.ViewState", viewState);
+                    if (startDate && endDate) {
+                        params.append("form:j_idt118_start", startDate);
+                        params.append("form:j_idt118_end", endDate);
+                    } else {
+                        // On récupère le timestamp du lundi de la semaine en cours
+                        const currentDate = new Date();
+                        const currentDay = currentDate.getDay();
+                        const daysUntilMonday =
+                            (currentDay === 0 ? 1 : 8) - currentDay;
+                        currentDate.setDate(
+                            currentDate.getDate() + daysUntilMonday,
+                        );
+                        currentDate.setHours(0, 0, 0, 0);
+                        const startTimestamp = currentDate.getTime();
+                        const endTimestamp =
+                            startTimestamp + 6 * 24 * 60 * 60 * 1000;
+                        params.append(
+                            "form:j_idt118_start",
+                            startTimestamp.toString(),
+                        );
+                        params.append(
+                            "form:j_idt118_end",
+                            endTimestamp.toString(),
+                        );
+                    }
+
                     const response = await this.session.sendPOST<string>(
                         "faces/Planning.xhtml",
                         params,
                     );
-
-                    const params2 = new URLSearchParams();
-                    // On ajoute les paramètres nécessaires pour effectuer une requête POST
-                    params2.append("form", "form");
-                    params2.append("javax.faces.ViewState", viewState);
-                    params2.append("form:sidebar", "form:sidebar");
-                    params2.append("form:sidebar_menuid", "1_4");
-                    const response2 = await this.session.sendPOST<string>(
-                        "faces/Planning.xhtml",
-                        params2,
-                    );
-                    viewState = getViewState(response2);
-                    if (!viewState) {
-                        return reject(new Error("Viewstate not found"));
-                    }
-                    const params3 = new URLSearchParams();
-                    params3.append("javax.faces.partial.ajax", "true");
-                    params3.append("javax.faces.source", "form:j_idt118");
-                    params3.append(
-                        "javax.faces.partial.execute",
-                        "form:j_idt118",
-                    );
-                    params3.append(
-                        "javax.faces.partial.render",
-                        "form:j_idt118",
-                    );
-                    params3.append("form:j_idt118", "form:j_idt118");
-                    params3.append("form:j_idt118_start", "1731279600000");
-                    params3.append("form:j_idt118_end", "1731798000000");
-                    params3.append("form", "form");
-                    params3.append(
-                        "form:idInit",
-                        "webscolaapp.Planning_-6802915683822110557",
-                    );
-                    params3.append("javax.faces.ViewState", viewState);
-                    const response3 = await this.session.sendPOST<string>(
-                        "faces/Planning.xhtml",
-                        params3,
-                    );
-                    console.log(getJSONSchedule(response3));
-                    resolve(response2);
+                    resolve(scheduleResponseToEvents(response));
                 } else {
                     reject(new Error("Viewstate not found"));
                 }
