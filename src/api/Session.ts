@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import ScheduleApi from "./ScheduleApi";
 import { getJSFFormParams, getViewState } from "../utils/AurionUtils";
+import NotesApi from "./NotesApi";
 
 class Session {
     private client: AxiosInstance;
@@ -18,6 +19,10 @@ class Session {
     // API pour le calendrier
     public getScheduleApi(): ScheduleApi {
         return new ScheduleApi(this);
+    }
+    // API pour les notes
+    public getNotesApi(): NotesApi {
+        return new NotesApi(this);
     }
 
     // (1ère phase) Besoin de simuler le clic sur la sidebar pour obtenir le ViewState nécessaire aux fonctionnements des reqûetes
@@ -40,7 +45,7 @@ class Session {
                 );
                 // On envoie la requête POST
                 const response = await this.sendPOST<string>(
-                    "faces/Planning.xhtml",
+                    `faces/Planning.xhtml`,
                     params,
                 );
                 resolve(response);
@@ -65,7 +70,7 @@ class Session {
                 params.append("form:sidebar", "form:sidebar");
                 params.append("form:sidebar_menuid", subMenuId);
                 const response = await this.sendPOST<string>(
-                    "faces/Planning.xhtml",
+                    `faces/Planning.xhtml`,
                     params,
                 );
                 const secondViewState = getViewState(response);
