@@ -12,10 +12,7 @@ class ScheduleApi {
     }
 
     // Récupération de l'emploi du temps en fonction de la date de début et de fin (timestamps en millisecondes)
-    public fetchSchedule(
-        startDate?: string,
-        endDate?: string,
-    ): Promise<ScheduleEvent[]> {
+    public fetchSchedule(startDate?: string): Promise<ScheduleEvent[]> {
         return new Promise<ScheduleEvent[]>(async (resolve, reject) => {
             try {
                 const schedulePage = await this.session.sendGET<string>(
@@ -40,8 +37,10 @@ class ScheduleApi {
                         "j_idt118",
                         viewState,
                     );
-                    if (startDate && endDate) {
+                    if (startDate) {
                         params.append("form:j_idt118_start", startDate);
+                        // La date de fin est fixée à une semaine après la date de début
+                        const endDate = startDate + 6 * 24 * 60 * 60 * 1000;
                         params.append("form:j_idt118_end", endDate);
                     } else {
                         // On récupère le timestamp du lundi de la semaine en cours
@@ -54,6 +53,7 @@ class ScheduleApi {
                         );
                         currentDate.setHours(0, 0, 0, 0);
                         const startTimestamp = currentDate.getTime();
+                        // On fixe la date de fin à une semaine après
                         const endTimestamp =
                             startTimestamp + 6 * 24 * 60 * 60 * 1000;
                         params.append(

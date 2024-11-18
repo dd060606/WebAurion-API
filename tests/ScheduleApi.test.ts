@@ -11,7 +11,6 @@ describe("ScheduleApi", () => {
 
         const session = await login(username, password);
         const schedule = await session.getScheduleApi().fetchSchedule();
-        console.log(schedule);
-        expect(schedule).not.toBeNull();
+        expect(schedule).toBeInstanceOf(Array);
     });
 });

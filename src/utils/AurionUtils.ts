@@ -23,6 +23,7 @@ export function getJSONSchedule(xml: string): object {
     return JSON.parse(json)["events"];
 }
 
+// On convertit la réponse du serveur XML en cours du planning
 export function scheduleResponseToEvents(response: string): ScheduleEvent[] {
     const json: any = getJSONSchedule(response);
 
@@ -31,11 +32,11 @@ export function scheduleResponseToEvents(response: string): ScheduleEvent[] {
         const eventInfo = event.title.split(" - ");
 
         let room = eventInfo[1].trim();
-        // Pour les matières qui ne sont pas bien formatées...
+        // Pour les matières qui ne sont pas bien formatées par défaut...
         let subject = "";
         let title = "";
         if (eventInfo.length >= 9) {
-            subject = eventInfo[eventInfo.length - 5].trim();
+            subject = eventInfo[eventInfo.length - 6].trim();
             title = eventInfo[eventInfo.length - 4].trim();
         } else {
             subject = eventInfo[eventInfo.length - 4].trim();
@@ -54,8 +55,6 @@ export function scheduleResponseToEvents(response: string): ScheduleEvent[] {
             learners,
             start: event.start,
             end: event.end,
-            allDay: event.allDay,
-            editable: event.editable,
             className: event.className,
         };
     });
