@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import ScheduleApi from "./ScheduleApi";
+import PlanningApi from "./PlanningApi";
 import { getJSFFormParams, getViewState } from "../utils/AurionUtils";
 import NotesApi from "./NotesApi";
 
@@ -17,8 +17,8 @@ class Session {
     }
 
     // API pour le calendrier
-    public getScheduleApi(): ScheduleApi {
-        return new ScheduleApi(this);
+    public getPlanningApi(): PlanningApi {
+        return new PlanningApi(this);
     }
     // API pour les notes
     public getNotesApi(): NotesApi {

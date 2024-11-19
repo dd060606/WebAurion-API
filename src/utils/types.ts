@@ -1,4 +1,4 @@
-type ScheduleEvent = {
+type PlanningEvent = {
     id: string;
     title: string;
     subject: string;
@@ -8,4 +8,18 @@ type ScheduleEvent = {
     start: string;
     end: string;
     className: string;
+};
+type Note = {
+    date: string;
+    code: string;
+    subject: string;
+    note: string;
+    absence: string;
+    description: string;
+    instructor: string;
+    [key: string]: string;
+};
+type NotesList = {
+    code: string;
+    notes: Note[];
 };

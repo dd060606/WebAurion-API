@@ -1,6 +1,6 @@
 import { login } from "../src/api/Session";
-describe("ScheduleApi", () => {
-    it("should receive a schedule", async () => {
+describe("PlanningApi", () => {
+    it("should receive a planning", async () => {
         const username = process.env.TEST_USERNAME;
         const password = process.env.TEST_PASSWORD;
         if (!username || !password) {
@@ -10,7 +10,8 @@ describe("ScheduleApi", () => {
         }
 
         const session = await login(username, password);
-        const schedule = await session.getScheduleApi().fetchSchedule();
-        expect(schedule).toBeInstanceOf(Array);
+        const planning = await session.getPlanningApi().fetchPlanning();
+        console.log(planning);
+        expect(planning).toBeInstanceOf(Array);
     });
 });

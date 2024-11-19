@@ -1,8 +1,5 @@
-import {
-    getJSFFormParams,
-    getViewState,
-    scheduleResponseToEvents,
-} from "../utils/AurionUtils";
+import { getViewState } from "../utils/AurionUtils";
+import { getNotesFromResponse } from "../utils/NotesUtils";
 import Session from "./Session";
 
 class NotesApi {
@@ -12,11 +9,12 @@ class NotesApi {
     }
 
     // Récupération des notes
-    public fetchNotes(): Promise<void> {
-        return new Promise<void>(async (resolve, reject) => {
+    public fetchNotes(): Promise<NotesList[]> {
+        return new Promise<NotesList[]>(async (resolve, reject) => {
             try {
+                // On part depuis la page planning pour pouvoir finalement accéder à la page des notes
                 const schedulePage = await this.session.sendGET<string>(
-                    "/faces/LearnerNotationListPage.xhtml",
+                    "/faces/Planning.xhtml",
                 );
                 let viewState = getViewState(schedulePage);
                 if (viewState) {
@@ -33,8 +31,7 @@ class NotesApi {
                     const response = await this.session.sendGET<string>(
                         "faces/LearnerNotationListPage.xhtml",
                     );
-                    console.log(response);
-                    resolve();
+                    resolve(getNotesFromResponse(response));
                 } else {
                     reject(new Error("Viewstate not found"));
                 }

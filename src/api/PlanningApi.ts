@@ -1,19 +1,16 @@
-import {
-    getJSFFormParams,
-    getViewState,
-    scheduleResponseToEvents,
-} from "../utils/AurionUtils";
+import { getJSFFormParams, getViewState } from "../utils/AurionUtils";
+import { planningResponseToEvents } from "../utils/PlanningUtils";
 import Session from "./Session";
 
-class ScheduleApi {
+class PlanningApi {
     private session: Session;
     constructor(session: Session) {
         this.session = session;
     }
 
     // Récupération de l'emploi du temps en fonction de la date de début et de fin (timestamps en millisecondes)
-    public fetchSchedule(startDate?: string): Promise<ScheduleEvent[]> {
-        return new Promise<ScheduleEvent[]>(async (resolve, reject) => {
+    public fetchPlanning(startDate?: string): Promise<PlanningEvent[]> {
+        return new Promise<PlanningEvent[]>(async (resolve, reject) => {
             try {
                 const schedulePage = await this.session.sendGET<string>(
                     "/faces/Planning.xhtml",
@@ -43,19 +40,22 @@ class ScheduleApi {
                         const endDate = startDate + 6 * 24 * 60 * 60 * 1000;
                         params.append("form:j_idt118_end", endDate);
                     } else {
-                        // On récupère le timestamp du lundi de la semaine en cours
-                        const currentDate = new Date();
-                        const currentDay = currentDate.getDay();
-                        const daysUntilMonday =
-                            (currentDay === 0 ? 1 : 8) - currentDay;
-                        currentDate.setDate(
-                            currentDate.getDate() + daysUntilMonday,
-                        );
-                        currentDate.setHours(0, 0, 0, 0);
-                        const startTimestamp = currentDate.getTime();
-                        // On fixe la date de fin à une semaine après
-                        const endTimestamp =
-                            startTimestamp + 6 * 24 * 60 * 60 * 1000;
+                        const now = new Date();
+                        // Obtenir le jour actuel (0 = dimanche, 1 = lundi, ..., 6 = samedi)
+                        let day = now.getDay();
+                        // Calculer la différence pour atteindre lundi (0 = dimanche => 1 jour pour atteindre lundi)
+                        const daysToMonday = day === 0 ? 1 : 1 - day;
+                        // Créer la date de début (lundi 6h00)
+                        const startDate = new Date(now);
+                        startDate.setDate(now.getDate() + daysToMonday); // Passer au lundi
+                        startDate.setHours(6, 0, 0, 0); // Fixer à 6h00
+                        // Date de fin (6 jours après la date de début)
+                        const endDate = new Date(startDate);
+                        endDate.setDate(startDate.getDate() + 6); // Ajouter 6 jours
+                        // Convertir les dates en timestamp
+                        const startTimestamp = startDate.getTime();
+                        const endTimestamp = endDate.getTime();
+
                         params.append(
                             "form:j_idt118_start",
                             startTimestamp.toString(),
@@ -70,7 +70,7 @@ class ScheduleApi {
                         "faces/Planning.xhtml",
                         params,
                     );
-                    resolve(scheduleResponseToEvents(response));
+                    resolve(planningResponseToEvents(response));
                 } else {
                     reject(new Error("Viewstate not found"));
                 }
@@ -81,4 +81,4 @@ class ScheduleApi {
     }
 }
 
-export default ScheduleApi;
+export default PlanningApi;

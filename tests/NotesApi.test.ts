@@ -1,4 +1,5 @@
 import { login } from "../src/api/Session";
+import { noteAverage } from "../src/utils/NotesUtils";
 describe("NotesApi", () => {
     it("should receive notes", async () => {
         const username = process.env.TEST_USERNAME;
@@ -10,7 +11,12 @@ describe("NotesApi", () => {
         }
 
         const session = await login(username, password);
-        const schedule = await session.getNotesApi().fetchNotes();
-        expect(schedule).not.toBeDefined();
+        const notes = await session.getNotesApi().fetchNotes();
+        console.log(JSON.stringify(notes, null, 2));
+        console.log("Les moyennes: ");
+        notes.forEach((note) => {
+            console.log(note.code + ": " + noteAverage(note.notes));
+        });
+        expect(notes).toBeInstanceOf(Array);
     });
 });
