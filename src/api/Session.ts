@@ -6,6 +6,11 @@ import NotesApi from "./NotesApi";
 class Session {
     private client: AxiosInstance;
 
+    //Permet de sauvegarder le ViewState et le subMenuId pour les réutiliser dans les prochaines requêtes (optimisation)
+    //Cela a pour but d'éviter d'effectuer 3 requêtes lorsque l'on refait la même demande (emploi du temps de la semaine suivante par exemple)
+    private viewStateCache: string = "";
+    private subMenuIdCache: string = "";
+
     constructor(baseURL: string, token: string) {
         this.client = axios.create({
             baseURL,
@@ -83,6 +88,47 @@ class Session {
                 reject(err);
             }
         });
+    }
+
+    // Récupération du ViewState pour effectuer les différentes requêtes
+    public getViewState(subMenuId: string): Promise<string> {
+        return new Promise<string>(async (resolve, reject) => {
+            //On optimise l'accès au ViewState
+            if (this.viewStateCache && this.subMenuIdCache === subMenuId) {
+                return resolve(this.viewStateCache);
+            }
+            try {
+                const schedulePage = await this.sendGET<string>(
+                    "/faces/Planning.xhtml",
+                );
+                let viewState = getViewState(schedulePage);
+                if (viewState) {
+                    // Ici 291906 correspond au menu 'Scolarité' dans la sidebar
+                    // Requête utile pour intialiser le ViewState (obligatoire pour effectuer une requête)
+                    await this.sendSidebarRequest("291906", viewState);
+
+                    // On récupère le ViewState pour effectuer la prochaine requête
+                    viewState = await this.sendSidebarSubmenuRequest(
+                        subMenuId,
+                        viewState,
+                    );
+                    if (viewState) {
+                        this.viewStateCache = viewState;
+                        this.subMenuIdCache = subMenuId;
+                        return resolve(viewState);
+                    }
+                }
+                return reject(new Error("Viewstate not found"));
+            } catch (error) {
+                reject(new Error("Viewstate not found"));
+            }
+        });
+    }
+
+    //Permet de vider le cache du ViewState et du subMenuId (si besoin)
+    public clearViewStateCache(): void {
+        this.viewStateCache = "";
+        this.subMenuIdCache = "";
     }
 
     public sendGET<T>(url: string): Promise<T> {
