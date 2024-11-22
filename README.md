@@ -116,6 +116,92 @@ async function fetchNotes() {
 fetchNotes();
 ```
 
+## 📋 Les Types
+
+Les réponses des fonctions renvoient les données récupérées depuis WebAurion au format JSON pour faciliter leur utilisation.
+
+### 🗓️ L'emploi du temps
+
+L'utilisation de `session.getPlanningApi().fetchPlanning()` renvoie un tableau du type `PlanningEvent` qui représente un événement dans l'emploi du temps d'un utilisateur.
+
+```typescript
+type PlanningEvent = {
+    id: string; // Identifiant unique de l'événement
+    title: string; // Titre de l'événement
+    subject: string; // La matière de l'événement (ex: "Mathématiques")
+    room: string; // Salle de l'événement
+    instructors: string; // Enseignants responsables de l'événement
+    learners: string; // Étudiants inscrits à cet événement
+    start: string; // Date et heure de début de l'événement
+    end: string; // Date et heure de fin de l'événement
+    className: string; // Nom de la classe associée (ex: "TP", "COURS")
+};
+```
+
+**Exemple**:
+
+```typescript
+const exampleEvent: PlanningEvent = {
+    id: "15447267",
+    title: "Mathématiques S1",
+    subject: "Mathématiques",
+    room: "A2_46 ISEN_DP ROB",
+    instructors: "Prof1 / Prof2",
+    learners: "CIR1 / CEST1",
+    start: "2024-11-19T08:00:00+0100",
+    end: "2024-11-19T10:00:00+0100",
+    className: "COURS",
+};
+```
+
+### 📝 Les notes
+
+L'utilisation de `session.getNotesApi().fetchNotes()` renvoie un tableau du type `NotesList` qui représente un ensemble de notes associées à un code de cours.
+
+```typescript
+type NotesList = {
+    code: string; // Code du cours ou de l'évaluation
+    notes: Note[]; // Liste des notes associées à ce code
+};
+type Note = {
+    date: string; // Date de la note
+    code: string; // Code du cours ou de l'évaluation
+    subject: string; // Matière concernée
+    note: string; // La note obtenue
+    absence: string; // Absence (si applicable)
+    description: string; // Appréciation de l'évaluation
+    instructor: string; // Enseignant responsable de l'évaluation
+};
+```
+
+**Exemple**:
+
+```typescript
+const exampleNotesList: NotesList = {
+    code: "24_CIR1N_A1_S1_PHYSIQUE",
+    notes: [
+        {
+            date: "02/10/2024",
+            code: "24_CIR1N_A1_S1_PHYSIQUE",
+            subject: "Physique DS1 S1",
+            note: "13.00",
+            absence: "",
+            description: "",
+            instructor: "Prof1",
+        },
+        {
+            date: "13/11/2024",
+            code: "24_CIR1N_A1_S1_PHYSIQUE",
+            subject: "Physique DS2 S1",
+            note: "17.00",
+            absence: "",
+            description: "",
+            instructor: "Prof1",
+        },
+    ],
+};
+```
+
 ## 🧪 Tests avec Jest
 
 Ce projet utilise [Jest](https://jestjs.io/) pour effectuer des tests unitaires et fonctionnels. Les tests se trouvent dans le répertoire `tests/`.
