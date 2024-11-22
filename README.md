@@ -1,7 +1,7 @@
 # WebAurion API
 
 **WebAurion API** est une bibliothèque Node.js écrite en TypeScript pour interagir avec l'API de WebAurion.  
-Elle permet de récupérer facilement **les notes** et **l'emploi du temps** depuis le site WebAurion.
+Elle permet de récupérer facilement **les notes** et **l'emploi du temps** depuis le site WebAurion en utilisant seulement des requêtes HTTP.
 
 ---
 
