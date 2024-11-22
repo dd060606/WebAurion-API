@@ -133,3 +133,30 @@ Vous pouvez vous inspirer du code dans les tests si besoin.
 ```bash
 npm test
 ```
+
+## 🔧 Configuration du fichier `.env`
+
+Pour utiliser correctement la bibliothèque et exécuter les tests, vous devez configurer un fichier `.env` pour stocker vos identifiants de connexion et autres variables sensibles.
+
+### 📁 Fichier `.env`
+
+Un fichier exemple est fourni dans le projet : `.env-example`. Voici les étapes pour le configurer :
+
+1. **Copier le fichier exemple**  
+   Dans le dossier racine du projet, créez un fichier `.env` à partir de l'exemple fourni :
+    ```bash
+    cp .env-example .env
+    ```
+2. **Remplir les valeurs**
+
+    Ouvrez le fichier .env et complétez les informations nécessaires :
+
+    ```env
+    TEST_USERNAME=votre-identifiant
+    TEST_PASSWORD=votre-mot-de-passe
+    ```
+
+-   `TEST_USERNAME` : L’identifiant WebAurion utilisé pour les tests.
+-   `TEST_PASSWORD` : Le mot de passe correspondant.
+
+⚠️ **Note** : Ces informations sont utilisées uniquement dans le cadre des tests et ne doivent pas être partagées publiquement.
