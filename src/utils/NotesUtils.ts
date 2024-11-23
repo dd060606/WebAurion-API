@@ -1,4 +1,5 @@
 import { load } from "cheerio";
+import { Note, NotesList } from "./types";
 
 export function getNotesFromResponse(htmlReponse: string): NotesList[] {
     // On parcourt le tableau des notes

@@ -1,9 +1,11 @@
 {
     "name": "webaurion-api",
     "version": "1.0.0",
-    "main": "index.js",
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
     "scripts": {
-        "build": "tsc",
+        "build": "tsup",
         "test": "jest",
         "lint": "eslint src --ext .ts"
     },
@@ -22,6 +24,10 @@
         "prettier": "^3.3.3",
         "ts-jest": "^29.2.5",
         "ts-node": "^10.9.2",
+        "tsup": "^8.3.5",
         "typescript": "^5.6.3"
-    }
+    },
+    "files": [
+        "dist/**/*"
+    ]
 }

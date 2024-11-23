@@ -1,5 +1,6 @@
 import { getJSFFormParams, getViewState } from "../utils/AurionUtils";
 import { planningResponseToEvents } from "../utils/PlanningUtils";
+import { PlanningEvent } from "../utils/types";
 import Session from "./Session";
 
 class PlanningApi {
@@ -56,6 +57,8 @@ class PlanningApi {
                 );
                 resolve(planningResponseToEvents(response));
             } catch (error) {
+                // En cas d'erreur, on supprime le cache de ViewState
+                this.session.clearViewStateCache();
                 reject(error);
             }
         });

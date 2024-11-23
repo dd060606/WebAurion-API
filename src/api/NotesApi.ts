@@ -1,5 +1,6 @@
 import { getViewState } from "../utils/AurionUtils";
 import { getNotesFromResponse } from "../utils/NotesUtils";
+import { NotesList } from "../utils/types";
 import Session from "./Session";
 
 class NotesApi {
@@ -20,6 +21,8 @@ class NotesApi {
                 );
                 resolve(getNotesFromResponse(response));
             } catch (error) {
+                // En cas d'erreur, on supprime le cache de ViewState
+                this.session.clearViewStateCache();
                 reject(error);
             }
         });

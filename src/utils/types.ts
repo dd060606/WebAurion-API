@@ -1,4 +1,4 @@
-type PlanningEvent = {
+export type PlanningEvent = {
     id: string;
     title: string;
     subject: string;
@@ -9,7 +9,7 @@ type PlanningEvent = {
     end: string;
     className: string;
 };
-type Note = {
+export type Note = {
     date: string;
     code: string;
     subject: string;
@@ -19,7 +19,7 @@ type Note = {
     instructor: string;
     [key: string]: string;
 };
-type NotesList = {
+export type NotesList = {
     code: string;
     notes: Note[];
 };

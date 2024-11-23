@@ -1,4 +1,5 @@
 import { load } from "cheerio";
+import { PlanningEvent } from "./types";
 
 // Conversion du calendrier au format JSON
 export function getJSONSchedule(xml: string): object {
