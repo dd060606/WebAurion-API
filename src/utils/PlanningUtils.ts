@@ -46,3 +46,26 @@ export function planningResponseToEvents(response: string): PlanningEvent[] {
         };
     });
 }
+
+// On récupère les dates de début et de fin de l'emploi du temps (par défaut, la semaine actuelle: 0)
+export function getScheduleDates(weeksFromNow: number = 0): {
+    startTimestamp: number;
+    endTimestamp: number;
+} {
+    const now = new Date();
+    // Obtenir le jour actuel (0 = dimanche, 1 = lundi, ..., 6 = samedi)
+    let day = now.getDay();
+    // Calculer la différence pour atteindre lundi
+    const daysToMonday = day === 0 ? 1 : 1 - day;
+    // Créer la date de début (lundi 6h00)
+    const startDate = new Date(now);
+    startDate.setDate(now.getDate() + daysToMonday + weeksFromNow * 7); // Passer au lundi de la semaine correspondante
+    startDate.setHours(6, 0, 0, 0); // Fixer à 6h00
+    // Date de fin (dimanche de la même semaine, 6 jours après le début)
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6); // Ajouter 6 jours
+    // Convertir les dates en timestamp
+    const startTimestamp = startDate.getTime();
+    const endTimestamp = endDate.getTime();
+    return { startTimestamp, endTimestamp };
+}
