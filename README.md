@@ -12,6 +12,14 @@ Elle permet de récupérer facilement **les notes** et **l'emploi du temps** dep
 -   **Node.js** (version 16 ou supérieure recommandée)
 -   **npm** ou **yarn**
 
+### 2. Installation
+
+Pour installer la bibliothèque dans votre projet, vous pouvez utiliser la commande suivante :
+
+```bash
+npm i webaurion-api
+```
+
 ### 2. Utilisation en local avec `npm link`
 
 Pour utiliser la bibliothèque dans un autre projet sans passer par un registre npm public :
