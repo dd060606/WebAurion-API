@@ -16,8 +16,7 @@
     "dependencies": {
         "axios": "^1.7.7",
         "cheerio": "1.0.0-rc.12",
-        "dotenv": "^16.4.5",
-        "jsdom-jscore-rn": "^0.1.9"
+        "dotenv": "^16.4.5"
     },
     "devDependencies": {
         "@types/jest": "^29.5.14",
