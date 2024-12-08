@@ -169,7 +169,7 @@ export function login(username: string, password: string): Promise<Session> {
                         .split("=")[1];
                     resolve(new Session(baseURL, token));
                 } else {
-                    reject(new Error("Login failed."));
+                    reject(response);
                 }
             })
             .catch((err) => {
@@ -180,7 +180,7 @@ export function login(username: string, password: string): Promise<Session> {
                         .split("=")[1];
                     resolve(new Session(baseURL, token));
                 } else {
-                    reject(new Error("Login failed."));
+                    reject(err);
                 }
             });
     });
