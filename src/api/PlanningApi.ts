@@ -1,4 +1,4 @@
-import { getJSFFormParams, getViewState } from "../utils/AurionUtils";
+import { getJSFFormParams } from "../utils/AurionUtils";
 import {
     getScheduleDates,
     planningResponseToEvents,

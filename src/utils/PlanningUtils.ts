@@ -1,15 +1,24 @@
-import { load } from "cheerio";
+import { JSDOM } from "jsdom";
+
 import { PlanningEvent } from "./types";
 
-// Conversion du calendrier au format JSON
-export function getJSONSchedule(xml: string): object {
-    const parser = load(xml, {
-        xmlMode: true,
-    });
-    const json = parser('update[id="form:j_idt118"]').text();
-    return JSON.parse(json)["events"];
-}
+export function getJSONSchedule(xml: string): Event[] {
+    const dom = new JSDOM(xml, { contentType: "text/xml" });
+    const document = dom.window.document;
 
+    // Utilisation de querySelector pour accéder à l'élément
+    const jsonText = document.querySelector(
+        'update[id="form:j_idt118"]',
+    )?.textContent;
+
+    if (!jsonText) {
+        return [];
+    }
+
+    const json = JSON.parse(jsonText);
+
+    return json["events"]; // Retourner les événements extraits
+}
 // On convertit la réponse du serveur XML en cours du planning
 export function planningResponseToEvents(response: string): PlanningEvent[] {
     const json: any = getJSONSchedule(response);
