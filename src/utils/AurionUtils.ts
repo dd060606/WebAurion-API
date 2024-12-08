@@ -1,15 +1,15 @@
-import { JSDOM } from "jsdom";
+import { load } from "cheerio";
 
 // Extraction du ViewState de la page HTML (obligatoire pour effectuer une requête)
 export function getViewState(html: string): string | undefined {
-    const dom = new JSDOM(html);
-    const document = dom.window.document;
-    const inputElement = document.querySelector(
-        'input[name="javax.faces.ViewState"]',
-    );
+    const parser = load(html);
+    //On recherche l'élément input avec l'attribut name="javax.faces.ViewState"
+    const inputElement = parser('input[name="javax.faces.ViewState"]');
 
-    if (inputElement) {
-        return inputElement.getAttribute("value") || undefined;
+    if (inputElement.length > 0) {
+        //On récupère la valeur de l'attribut value
+        const viewState = inputElement.attr("value");
+        return viewState;
     }
     return undefined;
 }
