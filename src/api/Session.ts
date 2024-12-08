@@ -3,7 +3,7 @@ import PlanningApi from "./PlanningApi";
 import { getJSFFormParams, getViewState } from "../utils/AurionUtils";
 import NotesApi from "./NotesApi";
 
-class Session {
+export class Session {
     private client: AxiosInstance;
 
     //Permet de sauvegarder le ViewState et le subMenuId pour les réutiliser dans les prochaines requêtes (optimisation)
