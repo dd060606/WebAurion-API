@@ -32,3 +32,50 @@ export function getJSFFormParams(
     params.append("javax.faces.ViewState", viewState);
     return params;
 }
+
+// Récupération du prénom / nom de l'utilisateur lors de la connexion
+export function getName(html: string): string {
+    const parser = load(html);
+    //On recherche de l'élément qui contient le prénom et le nom
+    const usernameElement = parser("li.ui-widget-header > h3");
+    if (usernameElement.length > 0) {
+        //On récupère le texte contenu dans l'élément
+        const username = usernameElement.text();
+        return username;
+    }
+    return "";
+}
+
+/**
+ * Extrait le sidebar_menuid correspondant à un texte donné dans le menu.
+ * @param {string} html - Le contenu HTML à parser
+ * @param {string} label - Le texte du menu à rechercher (ex: "Mon planning" ou "Mes notes")
+ * @returns {string|null} Le sidebar_menuid correspondant, ou null si non trouvé
+ */
+export function getSidebarMenuId(html: string, label: string): string | null {
+    const parser = load(html);
+
+    // Cherche le span dont le texte commence par `label`
+    const span = parser("span.ui-menuitem-text")
+        .filter((_, el) => {
+            const text = parser(el).text().trim();
+            return text.startsWith(label);
+        })
+        .first();
+
+    if (!span.length) {
+        // Non trouvé
+        return null;
+    }
+
+    // Trouve l’attribut onclick du lien parent
+    const onclick = span.closest("a").attr("onclick");
+    if (!onclick) {
+        // Non trouvé
+        return null;
+    }
+
+    // Extrait la valeur form:sidebar_menuid:'X_Y'
+    const match = onclick.match(/'form:sidebar_menuid':'([^']+)'/);
+    return match ? match[1] : null;
+}

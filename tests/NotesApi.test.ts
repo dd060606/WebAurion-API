@@ -1,4 +1,4 @@
-import { login } from "../src/api/Session";
+import Session from "../src/api/Session";
 import { noteAverage } from "../src/utils/NotesUtils";
 describe("NotesApi", () => {
     it("should receive notes", async () => {
@@ -10,7 +10,9 @@ describe("NotesApi", () => {
             );
         }
 
-        const session = await login(username, password);
+        const session = new Session();
+        await session.login(username, password);
+
         const notes = await session.getNotesApi().fetchNotes();
         console.log(JSON.stringify(notes, null, 2));
         console.log("Les moyennes: ");

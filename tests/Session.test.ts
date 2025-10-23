@@ -1,4 +1,4 @@
-import { login } from "../src/api/Session";
+import Session from "../src/api/Session";
 describe("AuthApi", () => {
     it("should log in a user and receive a session", async () => {
         const username = process.env.TEST_USERNAME;
@@ -9,7 +9,9 @@ describe("AuthApi", () => {
             );
         }
 
-        const result = await login(username, password);
-        expect(result).toBeDefined();
+        const session = new Session();
+        await session.login(username, password);
+
+        expect(session).toBeDefined();
     });
 });

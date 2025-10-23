@@ -1,4 +1,4 @@
-import { login } from "../src/api/Session";
+import Session from "../src/api/Session";
 import { getScheduleDates } from "../src/utils/PlanningUtils";
 describe("PlanningApi", () => {
     it("should receive a planning", async () => {
@@ -10,7 +10,9 @@ describe("PlanningApi", () => {
             );
         }
 
-        const session = await login(username, password);
+        const session = new Session();
+        await session.login(username, password);
+
         const planning = await session.getPlanningApi().fetchPlanning();
         console.log(planning);
         expect(planning).toBeInstanceOf(Array);
